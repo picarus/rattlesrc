@@ -570,10 +570,10 @@ rattle <- function(csvname=NULL, dataset=NULL, useGtkBuilder=NULL)
   crv$IMPUTE <- c(number=0, variable=1, comment=2)
 
   crv$CATEGORICAL <- c(number = 0, variable = 1, barplot = 2,
-                       dotplot = 3, mosplot = 4, comment = 5)
+                       dotplot = 3, mosplot = 4, paiplot=5, comment = 6)
 
   crv$CONTINUOUS <-  c(number = 0, variable = 1, boxplot = 2,
-                       hisplot = 3, cumplot = 4, benplot = 5, comment = 6)
+                       hisplot = 3, cumplot = 4, benplot = 5, paiplot=6, comment = 7)
 
   # Create constants naming DESCRIBE (i.e., the descriptive model
   # builders) and PREDICT (i.e., the predictive model builders). Note

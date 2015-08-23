@@ -1299,14 +1299,14 @@ resetVariableRoles <- function(variables, nrows, input=NULL, target=NULL,
                                zero=NULL, mean=NULL,
                                boxplot=NULL,
                                hisplot=NULL, cumplot=NULL, benplot=NULL,
-                               barplot=NULL, dotplot=NULL, mosplot=NULL,
+                               barplot=NULL, dotplot=NULL, mosplot=NULL, paiplot=NULL,
                                resample=TRUE, autoroles=TRUE)
 {
   # Update the SELECT treeview with the dataset variables.
 
   createVariablesModel(variables, input, target, risk, ident, ignore,
                        weight, zero, mean, boxplot, hisplot, cumplot,
-                       benplot, barplot, dotplot, mosplot,
+                       benplot, barplot, dotplot, mosplot, paiplot,
                        autoroles=autoroles)
 
   if (resample)
@@ -2683,7 +2683,15 @@ getSelectedVariables <- function(role, named=TRUE)
     model <- theWidget("categorical_treeview")$getModel()
     rcol  <- crv$CATEGORICAL[[role]]
   }
-
+  
+  else if (role %in% c("paiplot"))
+  {
+    model <- theWidget("continuous_treeview")$getModel()
+    rcol  <- crv$CONTINUOUS[[role]]
+    model2 <- theWidget("categorical_treeview")$getModel()
+    rcol2  <- crv$CATEGORICAL[[role]]
+  }
+  
   else
     return(NULL)
 
@@ -2709,7 +2717,21 @@ getSelectedVariables <- function(role, named=TRUE)
                     if (flag) variables <<- c(variables, variable)
                   return(FALSE) # Keep going through all rows
                 }, TRUE)
-
+  
+  if (role %in% c("paiplot")) # we need to collect the categorical variables too
+  {
+    model2$foreach(function(model2, path, iter, data)
+    {
+      flag <- model2$get(iter, rcol2)[[1]]
+      if (named)
+        variable <- model2$get(iter, vcol)[[1]]
+      else
+        variable <- model2$get(iter, ncol)[[1]]
+        if (flag) variables <<- c(variables, variable)
+      return(FALSE) # Keep going through all rows
+    }, TRUE)
+  }
+  
   # Set the data parameter to TRUE to avoid an RGtk2 bug in 2.12.1, fixed in
   # next release. 071117
 
@@ -2733,11 +2755,11 @@ initialiseVariableViews <- function()
 
   continuous <- RGtk2::gtkListStoreNew("gchararray", "gchararray",
                                 "gboolean", "gboolean",
-                                "gboolean", "gboolean", "gchararray")
+                                "gboolean", "gboolean", "gboolean", "gchararray")
 
 
   categorical <- RGtk2::gtkListStoreNew("gchararray", "gchararray",
-                                 "gboolean", "gboolean", "gboolean",
+                                 "gboolean", "gboolean", "gboolean", "gboolean",
                                  "gchararray")
 
 
@@ -2953,16 +2975,16 @@ initialiseVariableViews <- function()
                                        renderer,
                                        active = crv$CATEGORICAL[["mosplot"]])
 
-#   renderer <- RGtk2::gtkCellRendererToggleNew()
-#   renderer$set(xalign = 0.0)
-#   renderer$set(width = 60)
-#   renderer$setData("column", crv$CATEGORICAL["pairs"])
-#   RGtk2::connectSignal(renderer, "toggled", cat_toggled, categorical)
-#   cat.offset <-
-#     catview$insertColumnWithAttributes(-1,
-#                                        Rtxt("Pairs"),
-#                                        renderer,
-#                                        active = crv$CATEGORICAL[["pairs"]])
+  renderer <- RGtk2::gtkCellRendererToggleNew()
+  renderer$set(xalign = 0.0)
+  renderer$set(width = 60)
+  renderer$setData("column", crv$CATEGORICAL["paiplot"])
+  RGtk2::connectSignal(renderer, "toggled", cat_toggled, categorical)
+  cat.offset <-
+    catview$insertColumnWithAttributes(-1,
+                                       Rtxt("Pairs"),
+                                       renderer,
+                                       active = crv$CATEGORICAL[["paiplot"]])
   
   ## Add the boxplot, hisplot, cumplot, benplot buttons
 
@@ -3010,16 +3032,16 @@ initialiseVariableViews <- function()
                                        renderer,
                                        active = crv$CONTINUOUS[["benplot"]])
   
-#   renderer <- RGtk2::gtkCellRendererToggleNew()
-#   renderer$set(xalign = 0.0)
-#   renderer$set(width = 60)
-#   renderer$setData("column", crv$CONTINUOUS["pairs"])
-#   RGtk2::connectSignal(renderer, "toggled", con_toggled, continuous)
-#   con.offset <-
-#     conview$insertColumnWithAttributes(-1,
-#                                        Rtxt("Pairs"),
-#                                        renderer,
-#                                        active = crv$CONTINUOUS[["pairs"]])
+  renderer <- RGtk2::gtkCellRendererToggleNew()
+  renderer$set(xalign = 0.0)
+  renderer$set(width = 60)
+  renderer$setData("column", crv$CONTINUOUS["paiplot"])
+  RGtk2::connectSignal(renderer, "toggled", con_toggled, continuous)
+  con.offset <-
+    conview$insertColumnWithAttributes(-1,
+                                       Rtxt("Pairs"),
+                                       renderer,
+                                       active = crv$CONTINUOUS[["paiplot"]])
   
 
   ## Add the COMMENT column.
@@ -3070,7 +3092,8 @@ createVariablesModel <- function(variables, input=NULL, target=NULL,
                                  zero=NULL, mean=NULL,
                                  boxplot=NULL,
                                  hisplot=NULL, cumplot=NULL, benplot=NULL,
-                                 barplot=NULL, dotplot=NULL, mosplot=NULL,
+                                 barplot=NULL, dotplot=NULL, mosplot=NULL, 
+                                 paiplot=NULL,
                                  autoroles=TRUE)
 {
   # Set up the initial information about variables for use throughout
@@ -3434,6 +3457,7 @@ createVariablesModel <- function(variables, input=NULL, target=NULL,
                       crv$CATEGORICAL["barplot"], variables[i] %in% barplot,
                       crv$CATEGORICAL["dotplot"], variables[i] %in% dotplot,
                       crv$CATEGORICAL["mosplot"], variables[i] %in% mosplot,
+                      crv$CATEGORICAL["paiplot"], variables[i] %in% paiplot,
                       crv$CATEGORICAL["comment"],
                       sprintf("%s", strsplit(cl, " ")[[1]][2]))
     }
@@ -3448,6 +3472,7 @@ createVariablesModel <- function(variables, input=NULL, target=NULL,
                      crv$CONTINUOUS["hisplot"], variables[i] %in% hisplot,
                      crv$CONTINUOUS["cumplot"], variables[i] %in% cumplot,
                      crv$CONTINUOUS["benplot"], variables[i] %in% benplot,
+                     crv$CONTINUOUS["paiplot"], variables[i] %in% paiplot,
                      crv$CONTINUOUS["comment"],
                      sprintf("%.2f; %.2f/%.2f; %.2f",
                              min(crs$dataset[,i], na.rm=TRUE),

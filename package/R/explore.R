@@ -668,6 +668,7 @@ executeExplorePlot <- function(dataset,
                                barplots = getSelectedVariables("barplot"),
                                dotplots = getSelectedVariables("dotplot"),
                                mosplots = getSelectedVariables("mosplot"),
+                               paiplots = getSelectedVariables("paiplot"),
                                stratify=TRUE, sampling=NULL,
                                target=crs$target, newplot=TRUE)
 {
@@ -694,9 +695,15 @@ executeExplorePlot <- function(dataset,
   nbarplots <- length(barplots)
   ndotplots <- length(dotplots)
   nmosplots <- length(mosplots)
+  npaiplots <- as.integer(length(paiplots) >= 2) # only one plot is generated, 2 variables minimum are needed
 
+  if (npaiplots == 0 && length(paiplots)>0)
+  {
+    infoDialog(Rtxt("The Pairs plot requires at least two variables."))
+  }
+  
   total.plots <- nboxplots + nhisplots + length(cumplots) +
-    nbenplots + nbarplots + ndotplots + nmosplots
+    nbenplots + nbarplots + ndotplots + nmosplots + npaiplots
   
   pmax <- theWidget("plots_per_page_spinbutton")$getValue()
   pcnt <- 0
@@ -706,7 +713,7 @@ executeExplorePlot <- function(dataset,
   # distributions per target value.
 
   # 091011 Move to using the value of crs$target instead of getting it
-  # from the interface. Evenetually, pass target in as an argument so
+  # from the interface. Eventually, pass target in as an argument so
   # we can be independent of the GUI?
 
   # target <- getSelectedVariables("target")
@@ -1744,7 +1751,14 @@ executeExplorePlot <- function(dataset,
       }
     }
   }
+  
 
+  if (npaiplots > 0 )
+  {
+    
+  }
+  
+  
 ### REMOVE 080925 - Until work out multiple plots on one device issue.
 ###   if (nbarplots > 0)
 ###   {
@@ -2157,6 +2171,7 @@ executeExplorePlot2 <- function(dataset,
                                barplots = getSelectedVariables("barplot"),
                                dotplots = getSelectedVariables("dotplot"),
                                mosplots = getSelectedVariables("mosplot"),
+                               paiplots = getSelectedVariables("paiplot"),
                                stratify=TRUE, sampling=NULL,
                                target=crs$target)
 {
@@ -2185,9 +2200,15 @@ executeExplorePlot2 <- function(dataset,
   nbarplots <- length(barplots)
   ndotplots <- length(dotplots)
   nmosplots <- length(mosplots)
+  npaiplots <- as.integer(length(paiplots) >= 2) # only one plot is generated, 2 variables minimum are needed
 
+  if (npaiplots == 0 && length(paiplots)>0)
+  {
+    infoDialog(Rtxt("The Pairs plot requires at least two variables."))
+  }
+  
   total.plots <- nboxplots + nhisplots + length(cumplots) +
-    nbenplots + nbarplots + ndotplots + nmosplots
+    nbenplots + nbarplots + ndotplots + nmosplots + npaiplots
   
   pmax <- theWidget("plots_per_page_spinbutton")$getValue()
   pcnt <- 0
