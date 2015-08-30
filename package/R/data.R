@@ -788,6 +788,7 @@ executeDataTab <- function(csvname=NULL)
 
   executeSelectTab()
   resetTestTab()
+  resetExploreTab()
   
 # 100505 Move to before executeSelectTab, ohterwise the labels get set
 # back to stating no variables selected.
@@ -3197,7 +3198,8 @@ createVariablesModel <- function(variables, input=NULL, target=NULL,
                        union(cumplot,
                              union(benplot,
                                    union(barplot,
-                                         union(dotplot, mosplot))))))
+                                         union(paiplot,
+                                              union(dotplot, mosplot)))))))
 
   ## Build the Variables treeview model with each variable's INPUT set
   ## to TRUE and all else FALSE. If the variable has only a single

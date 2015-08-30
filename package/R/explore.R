@@ -21,6 +21,26 @@
 # You should have received a copy of the GNU General Public License
 # along with Rattle. If not, see <http://www.gnu.org/licenses/>.
 
+
+
+resetExploreTab <- function(new.dataset=TRUE)
+{
+  cbox1 <- theWidget("pairs_color_combobox")
+  cbox1$setSensitive(TRUE)
+  
+  if (new.dataset)
+  {
+    vl <- getCategoricVariables(type="names")
+    
+    if (length(vl))
+    {
+      cbox1$getModel()$clear()
+      cbox1$appendText(" ") # no color
+      lapply(vl, cbox1$appendText)
+    }
+  }
+}  
+
 ########################################################################
 # EXECUTION
 
@@ -1755,7 +1775,13 @@ executeExplorePlot <- function(dataset,
 
   if (npaiplots > 0 )
   {
-    
+    v1 <- theWidget("pairs_color_combobox")$getActiveText()
+    if (is.null(v1)) {
+      # there is no color selected
+      infoDialog(Rtxt("no color selected"))
+    } else {
+      infoDialog(Rtxt(v1))
+    }
   }
   
   
