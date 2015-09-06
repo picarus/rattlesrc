@@ -1663,8 +1663,6 @@ resetRattle <- function(new.dataset=TRUE)
     theWidget("benford_digits_spinbutton")$setValue(1)
     theWidget("explore_correlation_method_combobox")$setActive(0)
     theWidget("pairs_color_combobox")$getModel()$clear()
-    # theWidget("pairs_color_combobox")$setActive(T)
-    #     theWidget("pairs_color_combobox")$setSensitive(T)
 
     theWidget("glm_target_label")$setText(Rtxt("No Target"))
     theWidget("rpart_target_label")$setText(Rtxt("No Target"))

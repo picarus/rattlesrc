@@ -22,6 +22,16 @@
 # along with Rattle. If not, see <http://www.gnu.org/licenses/>.
 
 
+plottst<-function(){
+  
+  ggpairs( diamonds,
+           columns=c(1,2,3,7), colour="cut",  
+           diag = list(continuous="density", discrete="bar"),
+           upper = list(continuous = "cor", combo = "box", discrete ="ratio"),
+           lower = list(continuous = "points", combo = "denstrip", discrete= "facetbar")
+  ) 
+  
+}
 
 resetExploreTab <- function(new.dataset=TRUE)
 {
@@ -30,7 +40,7 @@ resetExploreTab <- function(new.dataset=TRUE)
   
   if (new.dataset)
   {
-    vl <- getCategoricVariables(type="names")
+    vl <- getCategoricVariables(type="names",include.target=T)
     
     if (length(vl))
     {
@@ -1772,18 +1782,45 @@ executeExplorePlot <- function(dataset,
     }
   }
   
-
+######################################################################################################33
+#
+#   Pairs plot
+#
+########################################################################################################
   if (npaiplots > 0 )
   {
     v1 <- theWidget("pairs_color_combobox")$getActiveText()
     if (is.null(v1)) {
       # there is no color selected
-      infoDialog(Rtxt("no color selected"))
-    } else {
-      infoDialog(Rtxt(v1))
+      infoDialog(Rtxt("No color selected"))
+    } 
+    
+    startLog(Rtxt("Pairs Plot"))
+    
+    if (packageIsAvailable("GGally","Plot a Pairs plot with ggpairs"))
+    {
+      
+      lib.cmd <- "library(GGally, quietly=TRUE)"
+      appendLog(packageProvides("GGally", "ggpairs"), lib.cmd)
+      eval(parse(text=lib.cmd))
+      
+      varsIndicies = getVariableIndicies(paiplots)
+      plot.cmd <- paste( 'print(',
+                         sprintf('ggpairs( %s,columns=c(%s), colour="%s",',dataset, 
+                                 paste( varsIndicies,collapse=',') ,v1),  
+                         'diag = list(continuous="density", discrete="bar"),',
+                         'upper = list(continuous = "cor", combo = "box", discrete ="ratio"),',
+                         'lower = list(continuous = "points", combo = "denstrip", discrete= "facetbar")))')
+      
+      eval(parse(text=plot.cmd))
+      ## title??
+      #infoDialog(Rtxt(plot.cmd))
+      
     }
+    
+    
   }
-  
+########################################################################################################  
   
 ### REMOVE 080925 - Until work out multiple plots on one device issue.
 ###   if (nbarplots > 0)

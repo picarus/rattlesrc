@@ -3626,7 +3626,7 @@ used.variables <- function(numonly=FALSE)
     return(simplifyNumberList(setdiff(fl, ii)))
 }
 
-getCategoricVariables <- function(type="string")
+getCategoricVariables <- function(type="string", include.target=F )
 {
   # Return a list of categoric variables from amongst those with an
   # INPUT role. If type is "names" than return the list of variable
@@ -3637,6 +3637,9 @@ getCategoricVariables <- function(type="string")
   if (length(cats) > 0)
   {
     indicies <- getVariableIndicies(crs$input)
+    if (include.target)
+      indicies<-c(indicies,getVariableIndicies(crs$target))
+      
     included <- intersect(cats, indicies)
     if (type=="names")
       include <- names(crs$dataset)[included]
