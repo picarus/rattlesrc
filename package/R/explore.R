@@ -1789,12 +1789,6 @@ executeExplorePlot <- function(dataset,
 ########################################################################################################
   if (npaiplots > 0 )
   {
-    v1 <- theWidget("pairs_color_combobox")$getActiveText()
-    if (is.null(v1)) {
-      # there is no color selected
-      infoDialog(Rtxt("No color selected"))
-    } 
-    
     startLog(Rtxt("Pairs Plot"))
     
     if (packageIsAvailable("GGally","Plot a Pairs plot with ggpairs"))
@@ -1805,16 +1799,26 @@ executeExplorePlot <- function(dataset,
       eval(parse(text=lib.cmd))
       
       varsIndicies = getVariableIndicies(paiplots)
-      plot.cmd <- paste( 'print(',
-                         sprintf('ggpairs( %s,columns=c(%s), colour="%s",',dataset, 
-                                 paste( varsIndicies,collapse=',') ,v1),  
+      
+      v1 <- theWidget("pairs_color_combobox")$getActiveText()
+      if (is.null(v1)) {
+        colorStr<-'' # no Color selected
+      } else {
+        colorStr<-sprintf('colour="%s",',v1)
+      }
+      
+      plot.cmd <- paste( 'suppressMessages(print(ggpairs(',    # suppressMessages is added to avoid the binwidth messages on the console
+                         dataset,
+                         ',columns=c(',paste( varsIndicies,collapse=','),'),', 
+                         colorStr,
                          'diag = list(continuous="density", discrete="bar"),',
                          'upper = list(continuous = "cor", combo = "box", discrete ="ratio"),',
-                         'lower = list(continuous = "points", combo = "denstrip", discrete= "facetbar")))')
+                         'lower = list(continuous = "points", combo = "denstrip", discrete= "facetbar"))))')
+      
+      appendLog(Rtxt("Display the pairs plot."), plot.cmd)
+      if (newplot) newPlot()
       
       eval(parse(text=plot.cmd))
-      ## title??
-      #infoDialog(Rtxt(plot.cmd))
       
     }
     
