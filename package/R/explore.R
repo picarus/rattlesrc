@@ -47,7 +47,7 @@ resetExploreTab <- function(new.dataset=TRUE)
       cbox1$getModel()$clear()
       cbox1$appendText(" ") # no color
       lapply(vl, cbox1$appendText)
-      if ( ! is.na(crs$target))
+      if ( length(crs$target))
         cbox1$setActive(length(vl)) # by construction we know is the last one
     }
   }
