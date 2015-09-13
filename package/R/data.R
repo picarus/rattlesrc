@@ -3636,11 +3636,12 @@ getCategoricVariables <- function(type="string", include.target=F )
   cats <- seq(1,ncol(crs$dataset))[as.logical(sapply(crs$dataset, is.factor))]
   if (length(cats) > 0)
   {
+
     indicies <- getVariableIndicies(crs$input)
     if (include.target)
       indicies<-c(indicies,getVariableIndicies(crs$target))
-      
     included <- intersect(cats, indicies)
+    
     if (type=="names")
       include <- names(crs$dataset)[included]
     else
